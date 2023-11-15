@@ -7,7 +7,7 @@ import numpy as np
 
 import gymnasium as gym
 from gymnasium import spaces
-from gymnasium.envs.box2d.car_dynamics import Car
+from car_dynamics_edited import Car
 from gymnasium.error import DependencyNotInstalled, InvalidAction
 from gymnasium.utils import EzPickle
 
@@ -486,6 +486,7 @@ class CarRacing(gym.Env, EzPickle):
                     )
                 )
         self.track = track
+        print(track[3])
         return True
 
     def reset(
