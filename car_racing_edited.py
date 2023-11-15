@@ -303,8 +303,9 @@ class CarRacing(gym.Env, EzPickle):
         # Create checkpoints
         checkpoints = []
         for c in range(CHECKPOINTS):
-            noise = self.np_random.uniform(0, 2 * math.pi * 1 / CHECKPOINTS)
-            alpha = 2 * math.pi * c / CHECKPOINTS + noise
+            #noise = self.np_random.uniform(0, 2 * math.pi * 1 / CHECKPOINTS)
+            #checking what happens if the noise is removed
+            alpha = 2 * math.pi * c / CHECKPOINTS #+ noise
             rad = self.np_random.uniform(TRACK_RAD / 3, TRACK_RAD)
 
             if c == 0:
