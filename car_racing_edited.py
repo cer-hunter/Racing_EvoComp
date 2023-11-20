@@ -577,7 +577,8 @@ class CarRacing(gym.Env, EzPickle):
 
         if self.render_mode == "human":
             self.render()
-        return self.state, step_reward, terminated, truncated, {}
+        info = {"pos_x": self.car.hull.position[0], "pos_y": self.car.hull.position[1], "angle": self.car.hull.angle, "speed": np.linalg.norm(self.car.hull.linearVelocity)}
+        return self.state, step_reward, terminated, truncated, info
 
     def render(self):
         if self.render_mode is None:
@@ -838,6 +839,7 @@ if __name__ == "__main__":
             if steps % 200 == 0 or terminated or truncated:
                 print("\naction " + str([f"{x:+0.2f}" for x in a]))
                 print(f"step {steps} total_reward {total_reward:+0.2f}")
+                print(info)
             steps += 1
             if terminated or truncated or restart or quit:
                 break
