@@ -298,7 +298,7 @@ class CarRacing(gym.Env, EzPickle):
             self.grass_color[idx] += 20
 
     def _create_track(self):
-        CHECKPOINTS = 12
+        CHECKPOINTS = 2
 
         # Create checkpoints
         checkpoints = []
@@ -306,7 +306,8 @@ class CarRacing(gym.Env, EzPickle):
             #noise = self.np_random.uniform(0, 2 * math.pi * 1 / CHECKPOINTS)
             #checking what happens if the noise is removed
             alpha = 2 * math.pi * c / CHECKPOINTS #+ noise
-            rad = self.np_random.uniform(TRACK_RAD / 3, TRACK_RAD)
+            #rad = self.np_random.uniform(TRACK_RAD / 3, TRACK_RAD)
+            rad = TRACK_RAD/CHECKPOINTS * c
 
             if c == 0:
                 alpha = 0
