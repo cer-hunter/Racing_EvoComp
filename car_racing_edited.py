@@ -526,7 +526,7 @@ class CarRacing(gym.Env, EzPickle):
                     "retry to generate track (normal if there are not many"
                     "instances of this message)"
                 )
-        self.car = Car(self.world, *self.track[0][1:4])
+        self.car = Car(self.world, -1.563, 10, -17)
 
         if self.render_mode == "human":
             self.render()
