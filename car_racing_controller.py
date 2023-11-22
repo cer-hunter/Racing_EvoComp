@@ -15,8 +15,17 @@ from deap import gp
 import gymnasium as gym
 import car_racing_edited
 
-#area for primitives definitioins and such (to be added later)
+#primitive definitions
+def protectedDiv(left, right):
+    try: return truncate(left, 8) / truncate(right, 8)
+    except ZeroDivisionError: return 0
+    
+def if_then_else(input, output1, output2):
+    if input: return output1
+    else: return output2
 
+def limit(input, minimum, maximum):
+    return min(max(input,minimum), maximum)
 # helper function to limit decimal places
 def truncate(number, decimals=0):
     if not isinstance(decimals, int):
