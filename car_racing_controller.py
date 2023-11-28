@@ -40,8 +40,11 @@ def truncate(number, decimals=0):
 obs_size = 3 # CartPole-v1 has 4 variables in each observation (change for other tasks)
 pset = gp.PrimitiveSet("MAIN", obs_size) 
 
-env_noviz = gym.make("CarRacing-v1")
-env_viz = gym.make("CarRacing-v1", render_mode="human")
+# env_noviz = gym.make("car_racing_edited:CarRacing-v2")
+# env_viz = gym.make("car_racing_edited:CarRacing-v2", render_mode="human")
+
+env_noviz = car_racing_edited.CarRacing()
+env_viz = car_racing_edited.CarRacing(render_mode="human")
 
 def action_wrapper(action): #placeholder for action wrapper
     return 0

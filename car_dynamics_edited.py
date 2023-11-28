@@ -24,7 +24,8 @@ except ImportError as e:
 
 
 SIZE = 0.02
-ENGINE_POWER = 100000000 * SIZE * SIZE
+ENGINE_POWER = 100000000 * SIZE * SIZE / 5  # Changed to 1/5 to original value
+BRAKE_FORCE = 15 / 5  # radians per second       # Changed to 1/5 to original value
 WHEEL_MOMENT_OF_INERTIA = 4000 * SIZE * SIZE
 FRICTION_LIMIT = (
     1000000 * SIZE * SIZE
@@ -209,7 +210,6 @@ class Car:
             if w.brake >= 0.9:
                 w.omega = 0
             elif w.brake > 0:
-                BRAKE_FORCE = 15  # radians per second
                 dir = -np.sign(w.omega)
                 val = BRAKE_FORCE * w.brake
                 if abs(val) > abs(w.omega):

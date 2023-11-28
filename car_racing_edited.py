@@ -11,6 +11,8 @@ from car_dynamics_edited import Car
 from gymnasium.error import DependencyNotInstalled, InvalidAction
 from gymnasium.utils import EzPickle
 
+from utils import *
+
 
 try:
     import Box2D
@@ -191,7 +193,6 @@ class CarRacing(gym.Env, EzPickle):
     ## Credits
     Created by Oleg Klimov
     """
-
     metadata = {
         "render_modes": [
             "human",
@@ -217,6 +218,9 @@ class CarRacing(gym.Env, EzPickle):
             domain_randomize,
             continuous,
         )
+        
+        print(" \n====== Loading Edited CarRacing Environment (CAS739) ====== \n")
+
         self.continuous = continuous
         self.domain_randomize = domain_randomize
         self.lap_complete_percent = lap_complete_percent
@@ -840,6 +844,10 @@ if __name__ == "__main__":
                 print("\naction " + str([f"{x:+0.2f}" for x in a]))
                 print(f"step {steps} total_reward {total_reward:+0.2f}")
                 print(info)
+                cx, cy = to_corner_coord(info["pos_x"], info["pos_y"])
+                print(f"Rel Corner Entry Coord {cx:+0.2f}, {cy:+0.2f}")
+                print(f"Rel Corner Entry Angle {to_entry_angle(info['angle']):+0.2f}")
+                print(f"Rel Corner Exit Angle {to_exit_angle(info['angle']):+0.2f}")
             steps += 1
             if terminated or truncated or restart or quit:
                 break
