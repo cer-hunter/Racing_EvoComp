@@ -11,3 +11,8 @@ Changes by Phil:
     - entry angle: angle with respect to the direction of the straight before the corner
         - 0 means perfectly aligned with the straight (should be the initial condition)
     - exit angle: angle with respect to the direction of the straight after the corner
+
+Further Changes by Hunter:
+- updated Action Wrapper to better reflect action space
+- updated primitive set
+- confused about the observations... is each pixel an observation?

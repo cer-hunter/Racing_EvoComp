@@ -5,7 +5,7 @@ import random
 import multiprocessing
 import operator
 from operator import attrgetter
-#place holder for now i dont know if we will want to use deap or pymoo or whatever
+
 from deap import algorithms
 from deap import base
 from deap import creator

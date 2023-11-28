@@ -5,12 +5,13 @@ import random
 import multiprocessing
 import operator
 from operator import attrgetter
-#place holder for now i dont know if we will want to use deap or pymoo or whatever
+
 from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
+from utils import *
 
 import gymnasium as gym
 import car_racing_edited
@@ -37,8 +38,15 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 3 # CartPole-v1 has 4 variables in each observation (change for other tasks)
-pset = gp.PrimitiveSet("MAIN", obs_size) 
+obs_size = 96*96*3 # CarRacing has an observation space of size (96, 96, 3)
+pset = gp.PrimitiveSet("MAIN", obs_size)
+pset.addPrimitive(operator.add, 2)
+pset.addPrimitive(operator.sub, 2)
+pset.addPrimitive(operator.mul, 2)
+pset.addPrimitive(protectedDiv, 2)
+pset.addPrimitive(math.sin, 1)
+#pset.addPrimitive(if_then_else, 3)
+#pset.addPrimitive(limit, 3)
 
 # env_noviz = gym.make("car_racing_edited:CarRacing-v2")
 # env_viz = gym.make("car_racing_edited:CarRacing-v2", render_mode="human")
@@ -46,8 +54,32 @@ pset = gp.PrimitiveSet("MAIN", obs_size)
 env_noviz = car_racing_edited.CarRacing()
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 
-def action_wrapper(action): #placeholder for action wrapper
-    return 0
+def action_wrapper(action): 
+    #for steering
+    if action[0] > 1:
+        steering = 1
+    elif action[0] < -1:
+        steering = -1
+    else:
+        steering = action[0]
+    #for gas
+    if action[1] > 1:
+        gas = 1
+    elif action[1] < 0:
+        gas = 0
+    else:
+        gas = action[1]
+    #for brakeing
+    if action[2] > 1:
+        brake = 1
+    elif action[2] < 0:
+        brake = 0
+    else:
+        brake = action[2]
+    #return full action array
+    return numpy.array([steering, gas, brake])
+        
+    
 
 # evaluates the fitness of an individual policy
 def evalRL(policy, vizualize=False):
@@ -66,8 +98,19 @@ def evalRL(policy, vizualize=False):
         num_steps = 0
         # evaluation episode
         while not (done or truncated):
+            #generate all observations (broken)
+            i = 0
+            j = 0
+            obs_space = []
+            for i in range(95):
+                for j in range(95):
+                    obs_space.append(observation[i][j][0])
+                    obs_space.append(observation[i][j][1])
+                    obs_space.append(observation[i][j][2])
+                    j+= 1
+                i += 1
             # use the expression tree to compute action
-            action = get_action(observation[0], observation[1], observation[2], observation[3]) #change for number of observations
+            action = get_action(obs_space)
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -119,27 +162,28 @@ mstats.register("min", numpy.min)
 mstats.register("max", numpy.max)
 
 #setup parallel evaluations
-pool = multiprocessing.Pool(processes=num_parallel_evals)
-toolbox.register("map", pool.map)
+if __name__ == "__main__":
+    pool = multiprocessing.Pool(processes=num_parallel_evals)
+    toolbox.register("map", pool.map)
 
-# run the evolutionary algorithm
-pop, log = algorithms.eaSimple(
-    pop,
-    toolbox,
-    prob_xover,
-    prob_mutate,
-    num_generations,
-    stats=mstats,
-    halloffame=hof,
-    verbose=True
-)
+    # run the evolutionary algorithm
+    pop, log = algorithms.eaSimple(
+        pop,
+        toolbox,
+        prob_xover,
+        prob_mutate,
+        num_generations,
+        stats=mstats,
+        halloffame=hof,
+        verbose=True
+    )
 
-pool.close()
+    pool.close()
 
-best_fits = log.chapters["fitness"].select("max")
-best_fit = truncate(hof[0].fitness.values[0], 0)
+    best_fits = log.chapters["fitness"].select("max")
+    best_fit = truncate(hof[0].fitness.values[0], 0)
 
-print("Best fitness: " + str(best_fit))
-print(hof[0])
+    print("Best fitness: " + str(best_fit))
+    print(hof[0])
 
-evalRL(policy=hof[0], vizualize=True)
+    evalRL(policy=hof[0], vizualize=True)
