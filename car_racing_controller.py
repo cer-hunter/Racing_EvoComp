@@ -38,7 +38,7 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 96*96*3 # CarRacing has an observation space of size (96, 96, 3)
+obs_size = 4 # Car Racing has been edited to use pos x, pos y, hull angle and speed as the observations
 pset = gp.PrimitiveSet("MAIN", obs_size)
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
@@ -98,19 +98,8 @@ def evalRL(policy, vizualize=False):
         num_steps = 0
         # evaluation episode
         while not (done or truncated):
-            #generate all observations (broken)
-            i = 0
-            j = 0
-            obs_space = []
-            for i in range(95):
-                for j in range(95):
-                    obs_space.append(observation[i][j][0])
-                    obs_space.append(observation[i][j][1])
-                    obs_space.append(observation[i][j][2])
-                    j+= 1
-                i += 1
             # use the expression tree to compute action
-            action = get_action(obs_space)
+            action = get_action(observation[0], observation[1], observation[2], observation[3])
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)

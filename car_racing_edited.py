@@ -254,9 +254,10 @@ class CarRacing(gym.Env, EzPickle):
         else:
             self.action_space = spaces.Discrete(5)
             # do nothing, left, right, gas, brake
-
-        self.observation_space = spaces.Box(
-            low=0, high=255, shape=(STATE_H, STATE_W, 3), dtype=np.uint8
+        high = np.array([PLAYFIELD, PLAYFIELD, np.inf, np.inf],dtype=np.float32) #pos x, pos y, angle, speed
+        low = np.array([-PLAYFIELD, -PLAYFIELD, -np.inf, 0],dtype=np.float32)
+        self.observation_space = spaces.Box( #edited to make the observations based on the car metrics rather then the visual 96x96 grid observation space
+            low=low, high=high, dtype=np.float32
         )
 
         self.render_mode = render_mode
