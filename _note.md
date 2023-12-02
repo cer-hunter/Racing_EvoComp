@@ -13,6 +13,6 @@ Changes by Phil:
     - exit angle: angle with respect to the direction of the straight after the corner
 
 Further Changes by Hunter:
-- updated Action Wrapper to better reflect action space... still a couple of hiccups here have to do some bugfixing
+- updated Action Wrapper to better reflect action space
 - updated primitive set
 - updated observation space

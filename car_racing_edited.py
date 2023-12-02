@@ -257,7 +257,7 @@ class CarRacing(gym.Env, EzPickle):
         high = np.array([PLAYFIELD, PLAYFIELD, np.inf, np.inf],dtype=np.float32) #pos x, pos y, angle, speed
         low = np.array([-PLAYFIELD, -PLAYFIELD, -np.inf, 0],dtype=np.float32)
         self.observation_space = spaces.Box( #edited to make the observations based on the car metrics rather then the visual 96x96 grid observation space
-            low=low, high=high, dtype=np.float32
+            low=low, high=high, shape = (4,), dtype=np.float32
         )
 
         self.render_mode = render_mode

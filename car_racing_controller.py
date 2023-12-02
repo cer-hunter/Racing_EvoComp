@@ -55,27 +55,35 @@ env_noviz = car_racing_edited.CarRacing()
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 
 def action_wrapper(action): 
+    # print(action)
+    # return action
     #for steering
-    if action[0] > 1:
+    steer_action = action[0][0] #for some reason the action has to be indexed twice to get a singular value? not sure if this might cause issues
+    #print(steer_action)
+    if steer_action > 1:
         steering = 1
-    elif action[0] < -1:
+    elif steer_action < -1:
         steering = -1
     else:
-        steering = action[0]
+        steering = steer_action
     #for gas
-    if action[1] > 1:
+    gas_action = action[0][1]
+    #print(gas_action)
+    if gas_action > 1:
         gas = 1
-    elif action[1] < 0:
+    elif gas_action < 0:
         gas = 0
     else:
-        gas = action[1]
+        gas = gas_action
     #for brakeing
-    if action[2] > 1:
+    brake_action = action[0][2]
+    #print(brake_action)
+    if brake_action > 1:
         brake = 1
-    elif action[2] < 0:
+    elif brake_action < 0:
         brake = 0
     else:
-        brake = action[2]
+        brake = brake_action
     #return full action array
     return numpy.array([steering, gas, brake])
         
@@ -99,6 +107,10 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
+            # print(observation[0])
+            # print(observation[1])
+            # print(observation[2])
+            # print(observation[3])
             action = get_action(observation[0], observation[1], observation[2], observation[3])
             action = action_wrapper(action)
             try:
