@@ -118,7 +118,6 @@ def evalRL(policy, vizualize=False):
                 return (0,)
             episode_reward += reward
             num_steps += 1
-            print(num_steps)
         fitness += episode_reward
     return (fitness / num_episode,)
 

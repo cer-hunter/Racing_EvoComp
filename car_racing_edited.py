@@ -150,9 +150,8 @@ class CarRacing(gym.Env, EzPickle):
     The car starts at rest in the center of the road.
 
     ## Episode Termination
-    The episode finishes when all the tiles are visited. The car can also go
-    outside the playfield - that is, far off the track, in which case it will
-    receive -100 reward and die. Also will terminate after 3 minutes or 9000 frames
+    The episode finishes when all the tiles are visited. The car cannot also go
+    outside the playfield - if it touches the grass it will die and recieve a -100 reward. Also will terminate at the lowest reward value of -900 (3 minutes of standing still).
 
     ## Arguments
     `lap_complete_percent` dictates the percentage of tiles that must be visited by
