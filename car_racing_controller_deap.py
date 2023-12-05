@@ -38,13 +38,14 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 4 # Car Racing has been edited to use pos x, pos y, hull angle and speed as the observations
+obs_size = 5 # Car Racing has been edited to use pos x, pos y, hull angle and speed as the observations
 pset = gp.PrimitiveSet("MAIN", obs_size)
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(protectedDiv, 2)
 pset.addPrimitive(math.sin, 1)
+pset.addTerminal(1)
 #pset.addPrimitive(if_then_else, 3)
 #pset.addPrimitive(limit, 3)
 
@@ -55,10 +56,9 @@ env_noviz = car_racing_edited.CarRacing()
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 
 def action_wrapper(action): 
-    # print(action)
-    # return action
+    print(action)
     #for steering
-    steer_action = action[0][0] #for some reason the action has to be indexed twice to get a singular value? not sure if this might cause issues
+    steer_action = action[0] #for some reason the action has to be indexed twice to get a singular value? not sure if this might cause issues
     #print(steer_action)
     if steer_action > 1:
         steering = 1
@@ -67,7 +67,7 @@ def action_wrapper(action):
     else:
         steering = steer_action
     #for gas
-    gas_action = action[0][1]
+    gas_action = action[1]
     #print(gas_action)
     if gas_action > 1:
         gas = 1
@@ -76,7 +76,7 @@ def action_wrapper(action):
     else:
         gas = gas_action
     #for brakeing
-    brake_action = action[0][2]
+    brake_action = action[2]
     #print(brake_action)
     if brake_action > 1:
         brake = 1
@@ -107,11 +107,7 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            # print(observation[0])
-            # print(observation[1])
-            # print(observation[2])
-            # print(observation[3])
-            action = get_action(observation[0], observation[1], observation[2], observation[3])
+            action = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -184,7 +180,7 @@ if __name__ == "__main__":
     best_fits = log.chapters["fitness"].select("max")
     best_fit = truncate(hof[0].fitness.values[0], 0)
 
-    print("Best fitness: " + str(best_fit))
-    print(hof[0])
+    #print("Best fitness: " + str(best_fit))
+    #print(hof[0])
 
     evalRL(policy=hof[0], vizualize=True)
