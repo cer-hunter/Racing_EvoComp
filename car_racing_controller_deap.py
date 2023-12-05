@@ -108,9 +108,9 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            action[0] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
-            action[1] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
-            action[2] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[0] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), 8)
+            action[1] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), 8)
+            action[2] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), 8)
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
