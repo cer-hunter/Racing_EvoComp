@@ -582,7 +582,13 @@ class CarRacing(gym.Env, EzPickle):
 
         if self.render_mode == "human":
             self.render()
-        info = {"pos_x": self.car.hull.position[0], "pos_y": self.car.hull.position[1], "angle": self.car.hull.angle, "speed": np.linalg.norm(self.car.hull.linearVelocity)}
+        info = {
+            "pos_x": self.car.hull.position[0], 
+            "pos_y": self.car.hull.position[1], 
+            "angle": self.car.hull.angle, 
+            "speed": np.linalg.norm(self.car.hull.linearVelocity),
+            'wheels_on_track': self.car.wheels_on_track
+            }
         return self.state, step_reward, terminated, truncated, info
 
     def render(self):
@@ -850,6 +856,6 @@ if __name__ == "__main__":
                 print(f"Rel Corner Entry Angle {to_entry_angle(info['angle']):+0.2f}")
                 print(f"Rel Corner Exit Angle {to_exit_angle(info['angle']):+0.2f}")
             steps += 1
-            if terminated or truncated or restart or quit:
+            if terminated or truncated or restart or quit or info['wheels_on_track'] == 0:
                 break
     env.close()

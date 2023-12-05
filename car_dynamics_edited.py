@@ -138,6 +138,7 @@ class Car:
             self.wheels.append(w)
         self.drawlist = self.wheels + [self.hull]
         self.particles = []
+        self.wheels_on_track = 4
 
     def gas(self, gas):
         """control: rear wheel drive
@@ -171,6 +172,7 @@ class Car:
         self.wheels[1].steer = s
 
     def step(self, dt):
+        self.wheels_on_track = 4
         for w in self.wheels:
             # Steer each wheel
             dir = np.sign(w.steer - w.joint.angle)
@@ -185,6 +187,8 @@ class Car:
                     friction_limit, FRICTION_LIMIT * tile.road_friction
                 )
                 grass = False
+            if grass:
+                self.wheels_on_track -= 1
 
             # Force
             forw = w.GetWorldVector((0, 1))
@@ -264,6 +268,8 @@ class Car:
                 ),
                 True,
             )
+        
+    
 
     def draw(self, surface, zoom, translation, angle, draw_particles=True):
         import pygame.draw
