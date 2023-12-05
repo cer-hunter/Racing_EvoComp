@@ -219,7 +219,7 @@ class CarRacing(gym.Env, EzPickle):
             continuous,
         )
         
-        print(" \n====== Loading Edited CarRacing Environment (CAS739) ====== \n")
+        # print(" \n====== Loading Edited CarRacing Environment (CAS739) ====== \n")
 
         self.continuous = continuous
         self.domain_randomize = domain_randomize
@@ -493,7 +493,7 @@ class CarRacing(gym.Env, EzPickle):
                     )
                 )
         self.track = track
-        print(track[3])
+        # print(track[3])
         return True
 
     def reset(
@@ -593,7 +593,8 @@ class CarRacing(gym.Env, EzPickle):
             "pos_y": self.car.hull.position[1], 
             "angle": self.car.hull.angle, 
             "speed": np.linalg.norm(self.car.hull.linearVelocity),
-            'wheels_on_track': self.car.wheels_on_track
+            'wheels_on_track': self.car.wheels_on_track,
+            'current_tile': self.tile_visited_count
             }
         return self.state, step_reward, terminated, truncated, info
 
