@@ -143,7 +143,7 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 random.seed(42)
 # set to the number of cpu cores available
-num_parallel_evals = 4
+num_parallel_evals = 4 #16 #change based on CPU host
 
 population_size = 24
 num_generations = 50
