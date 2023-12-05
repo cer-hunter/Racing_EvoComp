@@ -6,6 +6,10 @@ import multiprocessing
 import operator
 from operator import attrgetter
 
+import matplotlib.pyplot as plt
+import networkx as nx
+import pygraphviz as pgv
+
 from deap import algorithms
 from deap import base
 from deap import creator
@@ -183,7 +187,20 @@ if __name__ == "__main__":
     best_fits = log.chapters["fitness"].select("max")
     best_fit = truncate(hof[0].fitness.values[0], 0)
 
-    #print("Best fitness: " + str(best_fit))
-    #print(hof[0])
+    print("Best fitness: " + str(best_fit))
+    print(hof[0])
 
     evalRL(policy=hof[0], vizualize=True)
+
+    nodes, edges, labels = gp.graph(hof[0])
+    g = pgv.AGraph()
+    g.add_nodes_from(nodes)
+    g.add_edges_from(edges)
+    g.layout(prog="dot")
+
+    for i in nodes:
+        n = g.get_node(i)
+        n.attr["label"] = labels[i]
+
+    g.draw("tree.png")  # write tree graph to PNG file
+    
