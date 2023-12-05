@@ -56,7 +56,7 @@ env_noviz = car_racing_edited.CarRacing()
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 
 def action_wrapper(action): 
-    print(action)
+    #print(action)
     #for steering
     steer_action = action[0] #for some reason the action has to be indexed twice to get a singular value? not sure if this might cause issues
     #print(steer_action)
@@ -94,6 +94,7 @@ def evalRL(policy, vizualize=False):
     env = env_viz if vizualize else env_noviz
     num_episode = 20
     # transform expression tree to functional Python code
+    action = numpy.zeros(3)
     get_action = gp.compile(policy, pset)
     fitness = 0
     for x in range(0, num_episode):
@@ -107,7 +108,9 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            action = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[0] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[1] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[2] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -115,6 +118,7 @@ def evalRL(policy, vizualize=False):
                 return (0,)
             episode_reward += reward
             num_steps += 1
+            print(num_steps)
         fitness += episode_reward
     return (fitness / num_episode,)
 
