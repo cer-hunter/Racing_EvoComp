@@ -254,10 +254,11 @@ class CarRacing(gym.Env, EzPickle):
         else:
             self.action_space = spaces.Discrete(5)
             # do nothing, left, right, gas, brake
-        high = np.array([PLAYFIELD, PLAYFIELD, np.inf, np.inf],dtype=np.float32) #pos x, pos y, angle, speed
-        low = np.array([-PLAYFIELD, -PLAYFIELD, -np.inf, 0],dtype=np.float32)
+        TRACKLENGTH = 285
+        high = np.array([TRACKLENGTH, PLAYFIELD, PLAYFIELD, np.inf, np.inf],dtype=np.float32) #pos x, pos y, angle, speed
+        low = np.array([0, -PLAYFIELD, -PLAYFIELD, -np.inf, 0],dtype=np.float32)
         self.observation_space = spaces.Box( #edited to make the observations based on the car metrics rather then the visual 96x96 grid observation space
-            low=low, high=high, shape = (4,), dtype=np.float32
+            low=low, high=high, shape = (5,), dtype=np.float32
         )
 
         self.render_mode = render_mode
@@ -558,7 +559,11 @@ class CarRacing(gym.Env, EzPickle):
         self.world.Step(1.0 / FPS, 6 * 30, 2 * 30)
         self.t += 1.0 / FPS
 
-        self.state = self._render("state_pixels")
+        self.state = [self.tile_visited_count,
+                      self.car.hull.position[0],
+                      self.car.hull.position[1],
+                      self.car.hull.angle,
+                      np.linalg.norm(self.car.hull.linearVelocity)]
 
         step_reward = 0
         terminated = False
@@ -583,6 +588,7 @@ class CarRacing(gym.Env, EzPickle):
         if self.render_mode == "human":
             self.render()
         info = {
+            "tile#":self.tile_visited_count,
             "pos_x": self.car.hull.position[0], 
             "pos_y": self.car.hull.position[1], 
             "angle": self.car.hull.angle, 
