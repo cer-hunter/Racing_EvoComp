@@ -152,7 +152,7 @@ class CarRacing(gym.Env, EzPickle):
     ## Episode Termination
     The episode finishes when all the tiles are visited. The car can also go
     outside the playfield - that is, far off the track, in which case it will
-    receive -100 reward and die.
+    receive -100 reward and die. Also will terminate after 
 
     ## Arguments
     `lap_complete_percent` dictates the percentage of tiles that must be visited by
@@ -588,13 +588,12 @@ class CarRacing(gym.Env, EzPickle):
         if self.render_mode == "human":
             self.render()
         info = {
-            "tile#":self.tile_visited_count,
+            "current_tile":self.tile_visited_count,
             "pos_x": self.car.hull.position[0], 
             "pos_y": self.car.hull.position[1], 
             "angle": self.car.hull.angle, 
             "speed": np.linalg.norm(self.car.hull.linearVelocity),
-            'wheels_on_track': self.car.wheels_on_track,
-            'current_tile': self.tile_visited_count
+            'wheels_on_track': self.car.wheels_on_track
             }
         return self.state, step_reward, terminated, truncated, info
 
