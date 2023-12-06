@@ -1,24 +1,18 @@
-import math
 import numpy as np
-import pygame
-import random
-import multiprocessing
-import operator
 from operator import attrgetter
-
-from deap import algorithms
-from deap import base
-from deap import creator
-from deap import tools
-from deap import gp
-
-import gymnasium as gym
 
 import car_racing_edited
 from utils import *
 
+def init_tile_actions(track_length):
+    return np.random.rand(track_length*2) * 2 - 1
+
 def get_tile_action(tile_actions, tile):
-    return np.clip(tile_actions[tile*3:tile*3+3], -1.0, 1.0)
+    steer = tile_actions[tile*2]
+    accel = tile_actions[tile*2+1]
+    gas = accel if accel > 0 else 0
+    brake = -accel if accel < 0 else 0
+    return np.array([steer, gas, brake])
 
 def evaluate(tile_actions, visualize=False):
     env = env_viz if visualize else env_noviz
@@ -31,31 +25,13 @@ def evaluate(tile_actions, visualize=False):
         s, r, terminated, truncated, info = env.step(a)
         a = get_tile_action(tile_actions, info["current_tile"])
         total_reward -= r
-        if visualize and (steps % 200 == 0 or terminated or truncated):
+        if visualize and (steps % 200 == 0):
             print("\naction " + str([f"{x:+0.2f}" for x in a]))
         steps += 1
         if terminated or truncated or restart or info['wheels_on_track'] == 0 or total_reward > 10:
             break
+    # print(f"Total Reward: {total_reward}")
     return total_reward
-
-def oneplus_lambda(x, fitness, gens=100, lam=20):
-    x_best = x
-    f_best = fitness(x)
-    fits = np.zeros(gens)
-    for g in range(gens):
-        N = np.random.normal(size=(lam, len(x)))
-        for i in range(lam):
-            ind = x + N[i, :]
-            f = fitness(ind)
-            if f < f_best:
-                f_best = f
-                x_best = ind
-        x = x_best
-        fits[g] = f_best
-        print(f_best)
-    return fits, x_best
-
-
 
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 env_noviz = car_racing_edited.CarRacing()
@@ -71,5 +47,5 @@ for i in range(track_length):
 f = lambda x : evaluate(x)
 fits, x_best = oneplus_lambda(tile_actions, f)
 
-
-evaluate(tile_actions, visualize=True)
+while True:
+    evaluate(x_best, visualize=True)

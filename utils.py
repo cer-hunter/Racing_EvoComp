@@ -1,4 +1,23 @@
 import math
+import numpy as np
+
+def oneplus_lambda(x, fitness, gens=100, lam=20):
+    x_best = x
+    f_best = fitness(x)
+    fits = np.zeros(gens)
+    for g in range(gens):
+        N = np.random.normal(size=(lam, len(x)))
+        for i in range(lam):
+            ind = x + N[i, :]
+            f = fitness(ind)
+            if f < f_best:
+                f_best = f
+                x_best = ind
+                print(f"Generation: {g} Best Fitness: {f_best}")
+        x = x_best
+        fits[g] = f_best
+    return fits, x_best
+
 # Corner definitions
 
 # Angle (radians) of straights before and after corner
