@@ -97,7 +97,7 @@ def evalRL(policy, vizualize=False):
     num_episode = 20
     # transform expression tree to functional Python code
     action = numpy.zeros(3)
-    get_action = gp.compile(policy, pset)
+    get_action = truncate(gp.compile(policy, pset), 8) #truncate to avoid overflow
     fitness = 0
     for x in range(0, num_episode):
         done = False
@@ -110,9 +110,9 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            action[0] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), 8)
-            action[1] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), 8)
-            action[2] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), 8)
+            action[0] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[1] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[2] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -132,7 +132,7 @@ toolbox.register("individual", tools.initIterate, creator.Individual,
                  toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evalRL)
-toolbox.register("select", tools.selNSGA2, 4, nd= 'standard')
+toolbox.register("select", tools.selNSGA2, nd='standard')
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
