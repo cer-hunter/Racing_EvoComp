@@ -97,7 +97,7 @@ def evalRL(policy, vizualize=False):
     num_episode = 20
     # transform expression tree to functional Python code
     action = numpy.zeros(3)
-    get_action = truncate(gp.compile(policy, pset), 8) #truncate to avoid overflow
+    get_action = gp.compile(policy, pset) #truncate to avoid overflow
     fitness = 0
     for x in range(0, num_episode):
         done = False
@@ -110,9 +110,9 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            action[0] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
-            action[1] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
-            action[2] = get_action(observation[0],observation[1],observation[2],observation[3],observation[4])
+            action[0] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]))
+            action[1] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]))
+            action[2] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]))
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
