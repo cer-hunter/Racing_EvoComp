@@ -580,7 +580,7 @@ class CarRacing(gym.Env, EzPickle):
                 # but like a timeout
                 truncated = True
             x, y = self.car.hull.position
-            if abs(x) > PLAYFIELD or abs(y) > PLAYFIELD or self.reward <= -900:
+            if abs(x) > PLAYFIELD or abs(y) > PLAYFIELD or self.car.wheels_on_track==0 or self.reward <= -900:
                 terminated = True
                 step_reward = -100
 
@@ -861,6 +861,6 @@ if __name__ == "__main__":
                 print(f"Rel Corner Entry Angle {to_entry_angle(info['angle']):+0.2f}")
                 print(f"Rel Corner Exit Angle {to_exit_angle(info['angle']):+0.2f}")
             steps += 1
-            if terminated or truncated or restart or quit or info['wheels_on_track'] == 0:
+            if terminated or truncated or restart or quit:
                 break
     env.close()
