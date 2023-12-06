@@ -53,8 +53,6 @@ pset.addTerminal(1)
 #pset.addPrimitive(if_then_else, 3)
 #pset.addPrimitive(limit, 3)
 
-# env_noviz = gym.make("car_racing_edited:CarRacing-v2")
-# env_viz = gym.make("car_racing_edited:CarRacing-v2", render_mode="human")
 
 env_noviz = car_racing_edited.CarRacing()
 env_viz = car_racing_edited.CarRacing(render_mode="human")
@@ -62,7 +60,7 @@ env_viz = car_racing_edited.CarRacing(render_mode="human")
 def action_wrapper(action): 
     #print(action)
     #for steering
-    steer_action = action[0] #for some reason the action has to be indexed twice to get a singular value? not sure if this might cause issues
+    steer_action = action[0] 
     #print(steer_action)
     if steer_action > 1:
         steering = 1
@@ -134,7 +132,7 @@ toolbox.register("individual", tools.initIterate, creator.Individual,
                  toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evalRL)
-toolbox.register("select", tools.selTournament, tournsize=3)
+toolbox.register("select", tools.selNSGA2, 4, nd= 'standard')
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
@@ -146,9 +144,9 @@ random.seed(42)
 num_parallel_evals = 4 #16 #change based on CPU host
 
 population_size = 24
-num_generations = 50
-prob_xover = 0.9
-prob_mutate = 0.1
+num_generations = 50 #can be changed
+prob_xover = 0.8
+prob_mutate = 0.2
 
 pop = toolbox.population(n=population_size)
 
