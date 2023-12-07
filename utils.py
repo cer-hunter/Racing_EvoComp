@@ -1,22 +1,47 @@
 import math
+import cma
 import numpy as np
 
 def oneplus_lambda(x, fitness, gens=100, lam=20):
     x_best = x
     f_best = fitness(x)
+    x_history = {}
     fits = np.zeros(gens)
     for g in range(gens):
         N = np.random.normal(size=(lam, len(x)))
         for i in range(lam):
-            ind = x + N[i, :]
+            ind = np.clip(x + N[i, :], -1, 1)
             f = fitness(ind)
             if f < f_best:
                 f_best = f
                 x_best = ind
-                print(f"Generation: {g} Best Fitness: {f_best}")
+                x_history[g] = {'fitness': f_best, 'actions': x_best.tolist()}
+                print(f"Generation: {g}, Best Fitness: {f_best}")
         x = x_best
         fits[g] = f_best
-    return fits, x_best
+    return fits, x_best, x_history
+
+def cma_es(x, fitness, gens=100, popsize=10, processes=4):
+    es = cma.CMAEvolutionStrategy(x, 0.5, {'popsize': popsize, 'bounds': [-1.49, 1.49]})
+    x_best = x
+    f_best = fitness(x)
+    x_history = {}
+    fits = np.zeros(gens)
+    for g in range(gens):
+        solutions = es.ask()
+        pop_fits = []
+        for s in solutions:
+            f = fitness(s)
+            pop_fits.append(f)
+            if f < f_best:
+                f_best = f
+                x_best = s
+                x_history[g] = {'fitness': f_best, 'actions': x_best.tolist()}
+                print(f"Generation: {g}, Best Fitness: {f_best}")
+        es.tell(solutions, pop_fits)
+        es.disp()
+        fits[g] = f_best
+    return fits, x_best, x_history
 
 # Corner definitions
 
