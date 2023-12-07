@@ -75,7 +75,7 @@ else:
 # Run training
 f = lambda x : evaluate(x)
 # fits, actions_best, x_history = oneplus_lambda(x=tile_actions, fitness=f, gens=100)
-fits, actions_best, x_history = cma_es(x=tile_actions, fitness=f, gens=100, popsize=100)
+fits, actions_best, x_history = cma_es(x=tile_actions, fitness=f, gens=2000, popsize=50)
 
 
 
