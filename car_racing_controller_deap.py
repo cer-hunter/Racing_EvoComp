@@ -23,7 +23,7 @@ import car_racing_edited
 #primitive definitions
 def protectedDiv(left, right):
     try: return truncate(left, 8) / truncate(right, 8)
-    except ZeroDivisionError or ValueError: return 0
+    except ZeroDivisionError or ValueError: return 0 #if observation doesnt return a number r tries divide by 0
     
 def if_then_else(input, output1, output2):
     if input: return output1
@@ -168,7 +168,7 @@ num_parallel_evals = 20 #change based on CPU host
 population_size = 24 #can be tweaked for better results
 num_generations = 50 
 prob_xover = 0.9
-prob_mutate = 0.3
+prob_mutate = 0.4
 
 pop = toolbox.population(n=population_size)
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     print("Best fitness: " + str(best_fit))
     print(hof[0])
 
-    evalRL(policy=hof[0], vizualize=True)
+    #evalRL(policy=hof[0], vizualize=True)
 
     fig, ax1 = plt.subplots()
     line1 = ax1.plot(best_fits, "b-", label="Best Fitness")
