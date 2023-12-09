@@ -148,6 +148,6 @@ def evalRL(policy, vizualize=False):
     return (fitness / num_episode,)
 
 #changeable strategy... to reference arguments use pset.arguments[#]
-
-
+strategy = gp.PrimitiveTree.from_string("read(intreturn(TileCount))", pset) #enter best strategy tree here
+print(strategy)
 evalRL(policy = strategy, vizualize=True)
