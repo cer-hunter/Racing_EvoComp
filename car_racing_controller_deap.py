@@ -165,8 +165,8 @@ random.seed(42)
 # set to the number of cpu cores available
 num_parallel_evals = 4 #16 #change based on CPU host
 
-population_size = 24
-num_generations = 5 #can be changed
+population_size = 24 #can be tweaked for better results
+num_generations = 50 
 prob_xover = 0.9
 prob_mutate = 0.1
 
