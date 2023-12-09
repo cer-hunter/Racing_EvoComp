@@ -810,7 +810,7 @@ class CarRacing(gym.Env, EzPickle):
 
 
 if __name__ == "__main__":
-    a = np.array([0.0, 0.0, 0.0])
+    a = np.array([0.0, 0.0])
 
     def register_input():
         global quit, restart
@@ -823,7 +823,7 @@ if __name__ == "__main__":
                 if event.key == pygame.K_UP:
                     a[1] = +1.0
                 if event.key == pygame.K_DOWN:
-                    a[2] = +0.8  # set 1.0 for wheels to block to zero rotation
+                    a[1] = -0.8  # set 1.0 for wheels to block to zero rotation
                 if event.key == pygame.K_RETURN:
                     restart = True
                 if event.key == pygame.K_ESCAPE:
@@ -837,7 +837,7 @@ if __name__ == "__main__":
                 if event.key == pygame.K_UP:
                     a[1] = 0
                 if event.key == pygame.K_DOWN:
-                    a[2] = 0
+                    a[1] = 0
 
             if event.type == pygame.QUIT:
                 quit = True

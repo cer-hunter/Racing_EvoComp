@@ -166,7 +166,7 @@ random.seed(42)
 num_parallel_evals = 4 #16 #change based on CPU host
 
 population_size = 24
-num_generations = 25 #can be changed
+num_generations = 5 #can be changed
 prob_xover = 0.9
 prob_mutate = 0.1
 
