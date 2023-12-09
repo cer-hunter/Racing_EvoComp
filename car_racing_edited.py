@@ -563,8 +563,8 @@ class CarRacing(gym.Env, EzPickle):
         self.state = [self.tile_visited_count,
                       self.car.hull.position[0],
                       self.car.hull.position[1],
-                      self.car.hull.angle,
-                      np.linalg.norm(self.car.hull.linearVelocity)]
+                      self.car.wheels[0].joint.angle,
+                      np.sqrt(np.square(self.car.hull.linearVelocity[0])+ np.square(self.car.hull.linearVelocity[1]))]
 
         step_reward = 0
         terminated = False
@@ -592,8 +592,8 @@ class CarRacing(gym.Env, EzPickle):
             "current_tile":self.tile_visited_count,
             "pos_x": self.car.hull.position[0], 
             "pos_y": self.car.hull.position[1], 
-            "angle": self.car.hull.angle, 
-            "speed": np.linalg.norm(self.car.hull.linearVelocity),
+            "steering angle": self.car.wheels[0].joint.angle, 
+            "speed": np.sqrt(np.square(self.car.hull.linearVelocity[0])+ np.square(self.car.hull.linearVelocity[1])),
             'wheels_on_track': self.car.wheels_on_track
             }
         return self.state, step_reward, terminated, truncated, info
