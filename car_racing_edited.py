@@ -246,9 +246,9 @@ class CarRacing(gym.Env, EzPickle):
         # This will throw a warning in tests/envs/test_envs in utils/env_checker.py as the space is not symmetric
         #   or normalised however this is not possible here so ignore
         if self.continuous:
-            self.action_space = spaces.Box(
-                np.array([-1, 0, 0]).astype(np.float32),
-                np.array([+1, +1, +1]).astype(np.float32),
+            self.action_space = spaces.Box( #changed gas and break to be part of one action
+                np.array([-1, -1]).astype(np.float32),
+                np.array([+1, +1]).astype(np.float32),
             )  # steer, gas, brake
         else:
             self.action_space = spaces.Discrete(5)
@@ -542,8 +542,10 @@ class CarRacing(gym.Env, EzPickle):
         if action is not None:
             if self.continuous:
                 self.car.steer(-action[0])
-                self.car.gas(action[1])
-                self.car.brake(action[2])
+                if(action[1] > 0):
+                    self.car.gas(action[1])
+                elif(action[1]<0):
+                    self.car.brake(-action[1])
             else:
                 if not self.action_space.contains(action):
                     raise InvalidAction(

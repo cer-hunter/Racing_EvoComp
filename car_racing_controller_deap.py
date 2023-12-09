@@ -100,26 +100,17 @@ def action_wrapper(action):
         steering = -1
     else:
         steering = steer_action
-    #for gas
+    #for gas/brake
     gas_action = action[1]
     #print(gas_action)
     if gas_action > 1:
         gas = 1
-    elif gas_action < 0:
-        gas = 0
+    elif gas_action < -1:
+        gas = -1
     else:
         gas = gas_action
-    #for brakeing
-    brake_action = action[2]
-    #print(brake_action)
-    if brake_action > 1:
-        brake = 1
-    elif brake_action < 0:
-        brake = 0
-    else:
-        brake = brake_action
     #return full action array
-    return numpy.array([steering, gas, brake])
+    return numpy.array([steering, gas])
         
     
 
@@ -129,7 +120,7 @@ def evalRL(policy, vizualize=False):
     num_episode = 20
     # transform expression tree to functional Python code
     action = numpy.zeros(3)
-    get_action = gp.compile(policy, pset) #truncate to avoid overflow
+    get_action = gp.compile(policy, pset) 
     fitness = 0
     for x in range(0, num_episode):
         done = False
@@ -144,7 +135,6 @@ def evalRL(policy, vizualize=False):
             # use the expression tree to compute action
             action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
             action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
-            action[2] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -177,8 +167,8 @@ num_parallel_evals = 4 #16 #change based on CPU host
 
 population_size = 24
 num_generations = 25 #can be changed
-prob_xover = 0.8
-prob_mutate = 0.2
+prob_xover = 0.9
+prob_mutate = 0.1
 
 pop = toolbox.population(n=population_size)
 
