@@ -23,7 +23,7 @@ import car_racing_edited
 #primitive definitions
 def protectedDiv(left, right):
     try: return truncate(left, 8) / truncate(right, 8)
-    except ZeroDivisionError: return 0
+    except ZeroDivisionError or ValueError: return 0
     
 def if_then_else(input, output1, output2):
     if input: return output1
