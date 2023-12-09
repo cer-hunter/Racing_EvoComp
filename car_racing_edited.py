@@ -584,7 +584,7 @@ class CarRacing(gym.Env, EzPickle):
             x, y = self.car.hull.position
             if abs(x) > PLAYFIELD or abs(y) > PLAYFIELD or self.car.wheels_on_track==0 or self.reward <= -900:
                 terminated = True
-                step_reward = -100 - (len(self.track)-self.tile_visited_count) #gets rewarded more for reaching more tiles before terminating
+                step_reward = -100 - (285-self.tile_visited_count) #gets rewarded more for reaching more tiles before terminating
 
         if self.render_mode == "human":
             self.render()
