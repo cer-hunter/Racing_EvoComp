@@ -154,7 +154,7 @@ toolbox.register("individual", tools.initIterate, creator.Individual,
                  toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evalRL)
-toolbox.register("select", tools.selNSGA2, nd='standard')
+toolbox.register("select", tools.selDoubleTournament, fitness_size = 3, parsimony_size = 1, fitness_first = True)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
@@ -163,12 +163,12 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 random.seed(42)
 # set to the number of cpu cores available
-num_parallel_evals = 16 #change based on CPU host
+num_parallel_evals = 20 #change based on CPU host
 
 population_size = 24 #can be tweaked for better results
 num_generations = 50 
 prob_xover = 0.9
-prob_mutate = 0.1
+prob_mutate = 0.3
 
 pop = toolbox.population(n=population_size)
 
@@ -203,6 +203,7 @@ if __name__ == "__main__":
     )
 
     pool.close()
+    pool.join()
 
     best_fits = log.chapters["fitness"].select("max")
     best_fits_size = log.chapters["size"].select("avg")

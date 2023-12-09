@@ -148,6 +148,6 @@ def evalRL(policy, vizualize=False):
     return (fitness / num_episode,)
 
 #changeable strategy... to reference arguments use pset.arguments[#]
-strategy = gp.compile([pset.primitives[6],pset.primitives[10],pset.arguments[0]], pset) 
 
-evalRL(strategy, vizualize=True)
+
+evalRL(policy = strategy, vizualize=True)
