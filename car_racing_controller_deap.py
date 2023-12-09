@@ -76,7 +76,8 @@ pset.addPrimitive(write, [float, int], float)
 pset.addPrimitive(if_then_else, [float, float, float], float)
 pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
-pset.addTerminal(1, int)
+for i in range(0, memory.size):
+   pset.addTerminal(i, int)
 
 pset.renameArguments(ARG0="TileCount")
 pset.renameArguments(ARG1="PosX")
@@ -214,12 +215,32 @@ if __name__ == "__main__":
     pool.close()
 
     best_fits = log.chapters["fitness"].select("max")
+    best_fits_size = log.chapters["size"].select("avg")
     best_fit = truncate(hof[0].fitness.values[0], 0)
 
     print("Best fitness: " + str(best_fit))
     print(hof[0])
 
     evalRL(policy=hof[0], vizualize=True)
+
+    fig, ax1 = plt.subplots()
+    line1 = ax1.plot(best_fits, "b-", label="Best Fitness")
+    ax1.set_xlabel("Generation")
+    ax1.set_ylabel("Fitness", color="b")
+    for tl in ax1.get_yticklabels():
+        tl.set_color("b")
+
+    ax2 = ax1.twinx()
+    line2 = ax2.plot(best_fits_size, "r-", label="Average Size")
+    ax2.set_ylabel("Size", color="r")
+    for tl in ax2.get_yticklabels():
+        tl.set_color("r")
+
+    lns = line1 + line2
+    labs = [l.get_label() for l in lns]
+    ax1.legend(lns, labs, loc="center right")
+
+    plt.savefig("fitness.png")
 
     nodes, edges, labels = gp.graph(hof[0])
     g = pgv.AGraph()
