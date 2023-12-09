@@ -29,8 +29,30 @@ def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
-def limit(input, minimum, maximum):
+#Memory Primitives
+
+memory = np.zeros(8) #using global memory so that the array doesn't have to be passed as a variable by the tree
+
+def read(y):
+    if y < memory.size:
+        return memory[y]
+    else:
+        return 0
+
+def write(x, y):
+    if y < memory.size:
+        old_mem = memory[y]
+        memory[y] = x
+        return old_mem
+    else:
+        return 0
+    
+def intreturn(x): #to add primitive that returns an int
+    return x
+
+def limit(input, minimum, maximum): #unused
     return min(max(input,minimum), maximum)
+
 # helper function to limit decimal places
 def truncate(number, decimals=0):
     if not isinstance(decimals, int):
@@ -42,16 +64,25 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 5 # Car Racing has been edited to use pos x, pos y, hull angle and speed as the observations
-pset = gp.PrimitiveSet("MAIN", obs_size)
-pset.addPrimitive(operator.add, 2)
-pset.addPrimitive(operator.sub, 2)
-pset.addPrimitive(operator.mul, 2)
-pset.addPrimitive(protectedDiv, 2)
-pset.addPrimitive(math.sin, 1)
-pset.addTerminal(1)
-#pset.addPrimitive(if_then_else, 3)
-#pset.addPrimitive(limit, 3)
+obs_size = 5 # Car Racing has been edited to use #of tiles, pos x, pos y, hull angle and speed as the observations
+pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float], float)
+pset.addPrimitive(operator.add, [float, float], float)
+pset.addPrimitive(operator.sub, [float, float], float)
+pset.addPrimitive(operator.mul, [float, float], float)
+pset.addPrimitive(protectedDiv, [float, float], float)
+pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(read, [int], float) 
+pset.addPrimitive(write, [float, int], float)
+pset.addPrimitive(if_then_else, [float, float, float], float)
+pset.addPrimitive(limit, [float, float, float], float)
+pset.addPrimitive(intreturn, [int], int)
+pset.addTerminal(1, int)
+
+pset.renameArguments(ARG0="TileCount")
+pset.renameArguments(ARG1="PosX")
+pset.renameArguments(ARG2="PosY")
+pset.renameArguments(ARG3="CarAngle")
+pset.renameArguments(ARG4="Speed")
 
 
 env_noviz = car_racing_edited.CarRacing()
@@ -110,9 +141,9 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            action[0] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]))
-            action[1] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]))
-            action[2] = truncate(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]))
+            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
+            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
+            action[2] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -144,7 +175,7 @@ random.seed(42)
 num_parallel_evals = 4 #16 #change based on CPU host
 
 population_size = 24
-num_generations = 50 #can be changed
+num_generations = 25 #can be changed
 prob_xover = 0.8
 prob_mutate = 0.2
 
