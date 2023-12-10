@@ -254,10 +254,10 @@ class CarRacing(gym.Env, EzPickle):
             self.action_space = spaces.Discrete(5)
             # do nothing, left, right, gas, brake
         TRACKLENGTH = 285
-        high = np.array([TRACKLENGTH, PLAYFIELD, PLAYFIELD, np.inf, np.inf],dtype=np.float32) #pos x, pos y, angle, speed
-        low = np.array([0, -PLAYFIELD, -PLAYFIELD, -np.inf, 0],dtype=np.float32)
+        high = np.array([TRACKLENGTH, PLAYFIELD, PLAYFIELD, np.inf, np.inf, 4],dtype=np.float32) #pos x, pos y, angle, speed
+        low = np.array([0, -PLAYFIELD, -PLAYFIELD, -np.inf, 0, 0],dtype=np.float32)
         self.observation_space = spaces.Box( #edited to make the observations based on the car metrics rather then the visual 96x96 grid observation space
-            low=low, high=high, shape = (5,), dtype=np.float32
+            low=low, high=high, shape = (6,), dtype=np.float32
         )
 
         self.render_mode = render_mode
@@ -564,7 +564,8 @@ class CarRacing(gym.Env, EzPickle):
                       self.car.hull.position[0],
                       self.car.hull.position[1],
                       self.car.wheels[0].joint.angle,
-                      np.sqrt(np.square(self.car.hull.linearVelocity[0])+ np.square(self.car.hull.linearVelocity[1]))]
+                      np.sqrt(np.square(self.car.hull.linearVelocity[0])+ np.square(self.car.hull.linearVelocity[1])),
+                      self.car.wheels_on_track]
 
         step_reward = 0
         terminated = False
@@ -576,13 +577,13 @@ class CarRacing(gym.Env, EzPickle):
             self.car.fuel_spent = 0.0
             step_reward = self.reward - self.prev_reward
             self.prev_reward = self.reward
-            if self.tile_visited_count == len(self.track) or self.new_lap:
+            if self.tile_visited_count == len(self.track) or self.new_lap or self.reward <= -900:
                 # Truncation due to finishing lap
                 # This should not be treated as a failure
                 # but like a timeout
                 truncated = True
             x, y = self.car.hull.position
-            if abs(x) > PLAYFIELD or abs(y) > PLAYFIELD or self.car.wheels_on_track==0 or self.reward <= -900:
+            if abs(x) > PLAYFIELD or abs(y) > PLAYFIELD or self.car.wheels_on_track==0:
                 terminated = True
                 step_reward = -100 - (285-self.tile_visited_count) #gets rewarded more for reaching more tiles before terminating
 
@@ -860,8 +861,8 @@ if __name__ == "__main__":
                 print(info)
                 cx, cy = to_corner_coord(info["pos_x"], info["pos_y"])
                 print(f"Rel Corner Entry Coord {cx:+0.2f}, {cy:+0.2f}")
-                print(f"Rel Corner Entry Angle {to_entry_angle(info['angle']):+0.2f}")
-                print(f"Rel Corner Exit Angle {to_exit_angle(info['angle']):+0.2f}")
+                print(f"Rel Corner Entry Angle {to_entry_angle(info['steering angle']):+0.2f}")
+                print(f"Rel Corner Exit Angle {to_exit_angle(info['steering angle']):+0.2f}")
             steps += 1
             if terminated or truncated or restart or quit:
                 break

@@ -64,8 +64,8 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 5 # Car Racing has been edited to use #of tiles, pos x, pos y, hull angle and speed as the observations
-pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float], float)
+obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations
+pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float, int], float)
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
@@ -84,6 +84,7 @@ pset.renameArguments(ARG1="PosX")
 pset.renameArguments(ARG2="PosY")
 pset.renameArguments(ARG3="CarAngle")
 pset.renameArguments(ARG4="Speed")
+pset.renameArguments(ARG5="Wheels") #wheels on track
 
 
 env_noviz = car_racing_edited.CarRacing()
@@ -133,8 +134,8 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             # use the expression tree to compute action
-            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
-            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4]), -1, 1)
+            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
             action = action_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -166,7 +167,7 @@ random.seed(42)
 num_parallel_evals = 20 #change based on CPU host
 
 population_size = 24 #can be tweaked for better results
-num_generations = 50 
+num_generations = 75
 prob_xover = 0.9
 prob_mutate = 0.4
 
