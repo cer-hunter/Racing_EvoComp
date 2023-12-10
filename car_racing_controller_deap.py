@@ -29,9 +29,26 @@ def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
+def equal(input1, input2):
+    if input1 == input2:
+        return 1
+    else:
+        return 0
+
+def less(input1, input2):
+    if input1 < input2:
+        return 1
+    else:
+        return 0
+def max(input1, input2):
+    if input1>=input2:
+        return input1
+    else:
+        return input2
+
 #Memory Primitives
 
-memory = np.zeros(8) #using global memory so that the array doesn't have to be passed as a variable by the tree
+memory = np.zeros(6) #setting memory as number of observations
 
 def read(y):
     if y < memory.size:
@@ -74,6 +91,9 @@ pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
 pset.addPrimitive(if_then_else, [float, float, float], float)
+pset.addPrimitive(equal, [float, float], int)
+pset.addPrimitive(less, [float, float], int)
+pset.addPrimitive(max, [float, float], float)
 pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
 for i in range(0, memory.size):
