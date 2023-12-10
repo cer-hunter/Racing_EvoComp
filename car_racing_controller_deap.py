@@ -85,8 +85,8 @@ obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, steeri
 pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float, int], float)
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
-pset.addPrimitive(operator.mul, [float, float], float)
-pset.addPrimitive(protectedDiv, [float, float], float)
+#pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
+#pset.addPrimitive(protectedDiv, [float, float], float)
 pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
