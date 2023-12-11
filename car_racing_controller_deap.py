@@ -110,7 +110,7 @@ pset.renameArguments(ARG5="Wheels") #wheels on track
 env_noviz = car_racing_edited.CarRacing()
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 
-def action_wrapper(action): 
+def action_wrapper(action): #freeform action wrapper... allows for any combination of actions to occur
     #print(action)
     #for steering
     steer_action = action[0] 
@@ -132,15 +132,25 @@ def action_wrapper(action):
         gas = gas_action
     #return full action array
     return numpy.array([steering, gas])
-        
-    
+
+def discrete_wrapper(action): #defines a specific set of actions the car can take (basically discretizes them completely there is no continous spectrum)
+    if action == 0: # if number is 0 do nothing
+        return np.array([0, 0])
+    elif action > 0 and action <= 1: #action in range 0-1 turn left and gas
+        return np.array([-1, 1])
+    elif action > 1 and action <=2: #action in range 1-2 turn right and gas
+        return np.array([1, 1])
+    elif action > 2 and action <=3: #action in range 2-3 brake
+        return np.array([0, -0.8])
+    else: #otherwise just gas
+        return np.array([0,1])
 
 # evaluates the fitness of an individual policy
 def evalRL(policy, vizualize=False):
     env = env_viz if vizualize else env_noviz
     num_episode = 20
     # transform expression tree to functional Python code
-    action = numpy.zeros(3)
+    #action = numpy.zeros(2) #only if using action_wrapper
     get_action = gp.compile(policy, pset) 
     fitness = 0
     for x in range(0, num_episode):
@@ -153,10 +163,13 @@ def evalRL(policy, vizualize=False):
         num_steps = 0
         # evaluation episode
         while not (done or truncated):
-            # use the expression tree to compute action
-            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action = action_wrapper(action)
+            # use the expression tree to compute action from action_wrapper
+            #action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action = action_wrapper(action)
+            # use the expression tree to compute action from discrete_wrapper
+            action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
+            action = discrete_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
             except:
@@ -187,7 +200,7 @@ random.seed(42)
 num_parallel_evals = 20 #change based on CPU host
 
 population_size = 30 #can be tweaked for better results
-num_generations = 200
+num_generations = 100
 prob_xover = 0.9
 prob_mutate = 0.4
 
