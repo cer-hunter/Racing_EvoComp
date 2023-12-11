@@ -29,6 +29,22 @@ def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
+def eq(x, y):
+    if x == y:
+        return 1
+    else:
+        return 0
+def lt(x, y):
+    if x < y:
+        return 1
+    else:
+        return 0
+def gt(x, y):
+    if x > y:
+        return 1
+    else:
+        return 0
+
 #Memory Primitives
 
 memory = np.zeros(6) #setting memory as number of observations
@@ -63,15 +79,15 @@ def truncate(number, decimals=0):
 
 obs_size = 4 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations... removing posX and pos Y
 pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float], float) 
-pset.addPrimitive(np.add, [float, float], float)
-pset.addPrimitive(np.subtract, [float, float], float)
+pset.addPrimitive(operator.add, [float, float], float)
+pset.addPrimitive(operator.sub, [float, float], float)
 #pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
 #pset.addPrimitive(protectedDiv, [float, float], float)
 pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(if_then_else, [float, float, float], float)
-pset.addPrimitive(operator.eq, [float, float], float)
-pset.addPrimitive(operator.lt, [float, float], float)
-pset.addPrimitive(operator.gt, [float, float], float)
+pset.addPrimitive(eq, [float, float], float)
+pset.addPrimitive(lt, [float, float], float)
+pset.addPrimitive(gt, [float, float], float)
 pset.addPrimitive(max, [float, float], float)
 pset.addPrimitive(min, [float, float], float)
 pset.addPrimitive(read, [int], float) 
