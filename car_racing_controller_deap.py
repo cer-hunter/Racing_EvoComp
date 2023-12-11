@@ -152,7 +152,7 @@ def evalRL(policy, vizualize=False):
     env = env_viz if vizualize else env_noviz
     num_episode = 20
     # transform expression tree to functional Python code
-    #action = numpy.zeros(2) #only if using action_wrapper
+    action = numpy.zeros(2) #only if using action_wrapper
     get_action = gp.compile(policy, pset) 
     fitness = 0
     for x in range(0, num_episode):
