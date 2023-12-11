@@ -31,9 +31,26 @@ def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
+def equal(input1, input2):
+    if input1 == input2:
+        return 1
+    else:
+        return 0
+
+def less(input1, input2):
+    if input1 < input2:
+        return 1
+    else:
+        return 0
+def max(input1, input2):
+    if input1>=input2:
+        return input1
+    else:
+        return input2
+
 #Memory Primitives
 
-memory = np.zeros(8) #using global memory so that the array doesn't have to be passed as a variable by the tree
+memory = np.zeros(6) #using global memory so that the array doesn't have to be passed as a variable by the tree
 
 def read(y):
     if y < memory.size:
@@ -70,12 +87,15 @@ obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, hull a
 pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float, int], float)
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
-pset.addPrimitive(operator.mul, [float, float], float)
-pset.addPrimitive(protectedDiv, [float, float], float)
+#pset.addPrimitive(operator.mul, [float, float], float)
+#pset.addPrimitive(protectedDiv, [float, float], float)
 pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
 pset.addPrimitive(if_then_else, [float, float, float], float)
+pset.addPrimitive(equal, [float, float], int)
+pset.addPrimitive(less, [float, float], int)
+pset.addPrimitive(max, [float, float], float)
 pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
 for i in range(0, memory.size):
@@ -120,7 +140,7 @@ def action_wrapper(action):
 # evaluates the fitness of an individual policy
 def evalRL(policy, vizualize=False):
     env = env_viz if vizualize else env_noviz
-    num_episode = 20
+    num_episode = 5
     # transform expression tree to functional Python code
     action = numpy.zeros(3)
     get_action = gp.compile(policy, pset) 
@@ -149,6 +169,6 @@ def evalRL(policy, vizualize=False):
     return (fitness / num_episode,)
 
 #changeable strategy...
-strategy = gp.PrimitiveTree.from_string("limit(protectedDiv(CarAngle, write(write(PosX, 2), intreturn(0))), CarAngle, write(CarAngle, 0))", pset) #enter best strategy tree here
+strategy = gp.PrimitiveTree.from_string("write(sin(limit(sub(Speed, read(3)), sub(PosX, PosX), max(CarAngle, read(3)))), equal(max(sin(max(CarAngle, PosX)), write(if_then_else(CarAngle, write(if_then_else(PosX, add(PosX, Speed), PosX), equal(PosX, PosX)), sub(add(sub(PosX, PosX), limit(Speed, Speed, PosX)), add(PosX, Speed))), Wheels)), max(PosX, sub(read(equal(max(max(sub(max(CarAngle, Speed), add(PosX, Speed)), write(if_then_else(if_then_else(PosX, CarAngle, PosY), max(PosX, sub(Speed, PosX)), sin(sin(PosX))), Wheels)), read(equal(max(max(limit(sub(Speed, Speed), max(PosY, PosY), write(PosY, 5)), write(if_then_else(if_then_else(PosY, max(PosX, Speed), PosY), max(PosX, sub(Speed, PosX)), sin(PosX)), Wheels)), PosY), sin(PosX)))), PosX)), max(PosX, read(3))))))", pset) #enter best strategy tree here
 print(strategy)
 evalRL(policy = strategy, vizualize=True)
