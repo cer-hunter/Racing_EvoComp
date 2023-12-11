@@ -66,8 +66,8 @@ def write(x, y):
     else:
         return 0
     
-def intreturn(x): #to add primitive that returns an int
-    return x
+def intreturn(x):
+    return(x)
 
 def limit(input, minimum, maximum): #unused
     return min(max(input,minimum), maximum)
@@ -84,7 +84,7 @@ def truncate(number, decimals=0):
     return math.trunc(number * factor) / factor
 
 obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, hull angle and speed as the observations
-pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float, int], float)
+pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float, float, float], float)
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 #pset.addPrimitive(operator.mul, [float, float], float)
@@ -93,13 +93,16 @@ pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
 pset.addPrimitive(if_then_else, [float, float, float], float)
-pset.addPrimitive(equal, [float, float], int)
-pset.addPrimitive(less, [float, float], int)
+pset.addPrimitive(equal, [float, float], float)
+pset.addPrimitive(less, [float, float], float)
 pset.addPrimitive(max, [float, float], float)
 pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
 for i in range(0, memory.size):
    pset.addTerminal(i, int)
+for i in range(0, 285):
+   pset.addTerminal(i, float)
+
 
 pset.renameArguments(ARG0="TileCount")
 pset.renameArguments(ARG1="PosX")
@@ -134,6 +137,18 @@ def action_wrapper(action):
         gas = gas_action
     #return full action array
     return numpy.array([steering, gas])
+
+def discrete_wrapper(action): #defines a specific set of actions the car can take (basically discretizes them completely there is no continous spectrum)
+    if action == 0: # if number is 0 do nothing
+        return np.array([0, 0])
+    elif action > 0 and action <= 1: #action in range 0-1 turn left and gas
+        return np.array([-1, 1])
+    elif action > 1 and action <=2: #action in range 1-2 turn right and gas
+        return np.array([1, 1])
+    elif action > 2 and action <=3: #action in range 2-3 brake
+        return np.array([0, -0.8])
+    else: #otherwise just gas
+        return np.array([0,1])
         
     
 
@@ -155,10 +170,13 @@ def evalRL(policy, vizualize=False):
         num_steps = 0
         # evaluation episode
         while not (done or truncated):
-            # use the expression tree to compute action
-            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5] ), -1, 1)
-            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action = action_wrapper(action)
+             # use the expression tree to compute action from action_wrapper
+            #action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action = action_wrapper(action)
+            # use the expression tree to compute action from discrete_wrapper
+            action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
+            action = discrete_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
             except:
@@ -169,6 +187,9 @@ def evalRL(policy, vizualize=False):
     return (fitness / num_episode,)
 
 #changeable strategy...
-strategy = gp.PrimitiveTree.from_string("write(sin(limit(sub(Speed, read(3)), sub(PosX, PosX), max(CarAngle, read(3)))), equal(max(sin(max(CarAngle, PosX)), write(if_then_else(CarAngle, write(if_then_else(PosX, add(PosX, Speed), PosX), equal(PosX, PosX)), sub(add(sub(PosX, PosX), limit(Speed, Speed, PosX)), add(PosX, Speed))), Wheels)), max(PosX, sub(read(equal(max(max(sub(max(CarAngle, Speed), add(PosX, Speed)), write(if_then_else(if_then_else(PosX, CarAngle, PosY), max(PosX, sub(Speed, PosX)), sin(sin(PosX))), Wheels)), read(equal(max(max(limit(sub(Speed, Speed), max(PosY, PosY), write(PosY, 5)), write(if_then_else(if_then_else(PosY, max(PosX, Speed), PosY), max(PosX, sub(Speed, PosX)), sin(PosX)), Wheels)), PosY), sin(PosX)))), PosX)), max(PosX, read(3))))))", pset) #enter best strategy tree here
+strategy = gp.PrimitiveTree.from_string("if_then_else(less(60, TileCount), 1.0, 4.0)", pset) #enter best strategy tree here
 print(strategy)
 evalRL(policy = strategy, vizualize=True)
+
+#best strategy from action_wrapper
+#write(sin(limit(sub(Speed, read(3)), sub(PosX, PosX), max(CarAngle, read(3)))), equal(max(sin(max(CarAngle, PosX)), write(if_then_else(CarAngle, write(if_then_else(PosX, add(PosX, Speed), PosX), equal(PosX, PosX)), sub(add(sub(PosX, PosX), limit(Speed, Speed, PosX)), add(PosX, Speed))), Wheels)), max(PosX, sub(read(equal(max(max(sub(max(CarAngle, Speed), add(PosX, Speed)), write(if_then_else(if_then_else(PosX, CarAngle, PosY), max(PosX, sub(Speed, PosX)), sin(sin(PosX))), Wheels)), read(equal(max(max(limit(sub(Speed, Speed), max(PosY, PosY), write(PosY, 5)), write(if_then_else(if_then_else(PosY, max(PosX, Speed), PosY), max(PosX, sub(Speed, PosX)), sin(PosX)), Wheels)), PosY), sin(PosX)))), PosX)), max(PosX, read(3))))))

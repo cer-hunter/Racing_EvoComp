@@ -63,9 +63,9 @@ def write(x, y):
         return old_mem
     else:
         return 0
-    
-def intreturn(x): #to add primitive that returns an int
-    return x
+
+def intreturn(x):
+    return(x)
 
 def limit(input, minimum, maximum): #unused
     return min(max(input,minimum), maximum)
@@ -82,7 +82,7 @@ def truncate(number, decimals=0):
     return math.trunc(number * factor) / factor
 
 obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations
-pset = gp.PrimitiveSetTyped("MAIN", [int, float, float, float, float, int], float)
+pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float, float, float], float) 
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 #pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
@@ -91,13 +91,15 @@ pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
 pset.addPrimitive(if_then_else, [float, float, float], float)
-pset.addPrimitive(equal, [float, float], int)
-pset.addPrimitive(less, [float, float], int)
+pset.addPrimitive(equal, [float, float], float)
+pset.addPrimitive(less, [float, float], float)
 pset.addPrimitive(max, [float, float], float)
 pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
 for i in range(0, memory.size):
    pset.addTerminal(i, int)
+for i in range(0, 285): #for tilecount
+   pset.addTerminal(i, float)
 
 pset.renameArguments(ARG0="TileCount")
 pset.renameArguments(ARG1="PosX")
@@ -163,13 +165,13 @@ def evalRL(policy, vizualize=False):
         num_steps = 0
         # evaluation episode
         while not (done or truncated):
-            # use the expression tree to compute action from action_wrapper
-            #action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            #action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            #action = action_wrapper(action)
+            #use the expression tree to compute action from action_wrapper
+            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            action = action_wrapper(action)
             # use the expression tree to compute action from discrete_wrapper
-            action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
-            action = discrete_wrapper(action)
+            #action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
+            #action = discrete_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
             except:
