@@ -29,23 +29,6 @@ def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
-def equal(input1, input2):
-    if input1 == input2:
-        return 1
-    else:
-        return 0
-
-def less(input1, input2):
-    if input1 < input2:
-        return 1
-    else:
-        return 0
-def max(input1, input2):
-    if input1>=input2:
-        return input1
-    else:
-        return input2
-
 #Memory Primitives
 
 memory = np.zeros(6) #setting memory as number of observations
@@ -67,9 +50,6 @@ def write(x, y):
 def intreturn(x):
     return(x)
 
-def limit(input, minimum, maximum): #unused
-    return min(max(input,minimum), maximum)
-
 # helper function to limit decimal places
 def truncate(number, decimals=0):
     if not isinstance(decimals, int):
@@ -88,13 +68,14 @@ pset.addPrimitive(operator.sub, [float, float], float)
 #pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
 #pset.addPrimitive(protectedDiv, [float, float], float)
 pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(if_then_else, [float, float, float], float)
+pset.addPrimitive(operator.eq, [float, float], float)
+pset.addPrimitive(operator.lt, [float, float], float)
+pset.addPrimitive(operator.gt, [float, float], float)
+pset.addPrimitive(max, [float, float], float)
+pset.addPrimitive(min, [float, float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
-pset.addPrimitive(if_then_else, [float, float, float], float)
-pset.addPrimitive(equal, [float, float], float)
-pset.addPrimitive(less, [float, float], float)
-pset.addPrimitive(max, [float, float], float)
-pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
 for i in range(0, memory.size):
    pset.addTerminal(i, int)
