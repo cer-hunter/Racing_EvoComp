@@ -152,7 +152,7 @@ def evalRL(policy, vizualize=False):
     env = env_viz if vizualize else env_noviz
     num_episode = 20
     # transform expression tree to functional Python code
-    action = numpy.zeros(2) #only if using action_wrapper
+    #action = numpy.zeros(2) #only if using action_wrapper
     get_action = gp.compile(policy, pset) 
     fitness = 0
     for x in range(0, num_episode):
@@ -166,12 +166,12 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
             #use the expression tree to compute action from action_wrapper
-            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action = action_wrapper(action)
+            #action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action = action_wrapper(action)
             # use the expression tree to compute action from discrete_wrapper
-            #action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
-            #action = discrete_wrapper(action)
+            action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
+            action = discrete_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
             except:
