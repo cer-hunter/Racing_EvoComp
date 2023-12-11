@@ -31,23 +31,6 @@ def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
-def equal(input1, input2):
-    if input1 == input2:
-        return 1
-    else:
-        return 0
-
-def less(input1, input2):
-    if input1 < input2:
-        return 1
-    else:
-        return 0
-def max(input1, input2):
-    if input1>=input2:
-        return input1
-    else:
-        return input2
-
 #Memory Primitives
 
 memory = np.zeros(6) #using global memory so that the array doesn't have to be passed as a variable by the tree
@@ -69,9 +52,6 @@ def write(x, y):
 def intreturn(x):
     return(x)
 
-def limit(input, minimum, maximum): #unused
-    return min(max(input,minimum), maximum)
-
 # helper function to limit decimal places
 def truncate(number, decimals=0):
     if not isinstance(decimals, int):
@@ -83,33 +63,34 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, hull angle and speed as the observations
-pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float, float, float], float)
+obs_size = 4 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations... removing posX and pos Y
+pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float], float) 
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
-#pset.addPrimitive(operator.mul, [float, float], float)
+#pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
 #pset.addPrimitive(protectedDiv, [float, float], float)
 pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(if_then_else, [float, float, float], float)
+pset.addPrimitive(operator.eq, [float, float], float)
+pset.addPrimitive(operator.lt, [float, float], float)
+pset.addPrimitive(operator.gt, [float, float], float)
+pset.addPrimitive(max, [float, float], float)
+pset.addPrimitive(min, [float, float], float)
 pset.addPrimitive(read, [int], float) 
 pset.addPrimitive(write, [float, int], float)
-pset.addPrimitive(if_then_else, [float, float, float], float)
-pset.addPrimitive(equal, [float, float], float)
-pset.addPrimitive(less, [float, float], float)
-pset.addPrimitive(max, [float, float], float)
-pset.addPrimitive(limit, [float, float, float], float)
 pset.addPrimitive(intreturn, [int], int)
 for i in range(0, memory.size):
    pset.addTerminal(i, int)
-for i in range(0, 285):
+for i in range(0, 285): #for tilecount
    pset.addTerminal(i, float)
 
 
 pset.renameArguments(ARG0="TileCount")
-pset.renameArguments(ARG1="PosX")
-pset.renameArguments(ARG2="PosY")
-pset.renameArguments(ARG3="CarAngle")
-pset.renameArguments(ARG4="Speed")
-pset.renameArguments(ARG5="Wheels") #wheels on track
+#pset.renameArguments(ARG1="PosX")
+#pset.renameArguments(ARG2="PosY")
+pset.renameArguments(ARG1="CarAngle")
+pset.renameArguments(ARG2="Speed")
+pset.renameArguments(ARG3="Wheels") #wheels on track
 
 
 env_noviz = car_racing_edited.CarRacing()
@@ -141,10 +122,10 @@ def action_wrapper(action):
 def discrete_wrapper(action): #defines a specific set of actions the car can take (basically discretizes them completely there is no continous spectrum)
     if action == 0: # if number is 0 do nothing
         return np.array([0, 0])
-    elif action > 0 and action <= 1: #action in range 0-1 turn left and gas
-        return np.array([-1, 1])
-    elif action > 1 and action <=2: #action in range 1-2 turn right and gas
-        return np.array([1, 1])
+    elif action > 0 and action <= 1: #action in range 0-1 turn left
+        return np.array([-1, 0])
+    elif action > 1 and action <=2: #action in range 1-2 turn right
+        return np.array([1, 0])
     elif action > 2 and action <=3: #action in range 2-3 brake
         return np.array([0, -0.8])
     else: #otherwise just gas
@@ -171,12 +152,12 @@ def evalRL(policy, vizualize=False):
         # evaluation episode
         while not (done or truncated):
              # use the expression tree to compute action from action_wrapper
-            action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
-            action = action_wrapper(action)
+            #action[0] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
+            #action = action_wrapper(action)
             # use the expression tree to compute action from discrete_wrapper
-            #action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
-            #action = discrete_wrapper(action)
+            action = numpy.clip(get_action(observation[0],observation[3],observation[4], observation[5]), 0, 4)
+            action = discrete_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
             except:

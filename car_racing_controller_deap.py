@@ -63,8 +63,8 @@ def truncate(number, decimals=0):
 
 obs_size = 4 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations... removing posX and pos Y
 pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float], float) 
-pset.addPrimitive(operator.add, [float, float], float)
-pset.addPrimitive(operator.sub, [float, float], float)
+pset.addPrimitive(np.add, [float, float], float)
+pset.addPrimitive(np.subtract, [float, float], float)
 #pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
 #pset.addPrimitive(protectedDiv, [float, float], float)
 pset.addPrimitive(math.sin, [float], float)
