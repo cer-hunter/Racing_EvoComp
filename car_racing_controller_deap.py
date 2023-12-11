@@ -81,8 +81,8 @@ def truncate(number, decimals=0):
     factor = 10.0 ** decimals
     return math.trunc(number * factor) / factor
 
-obs_size = 6 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations
-pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float, float, float], float) 
+obs_size = 4 # Car Racing has been edited to use #of tiles, pos x, pos y, steering angle, true speed and wheels on track as the observations... removing posX and pos Y
+pset = gp.PrimitiveSetTyped("MAIN", [float, float, float, float], float) 
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 #pset.addPrimitive(operator.mul, [float, float], float) #division and multiplication result in numbers much too large
@@ -102,11 +102,11 @@ for i in range(0, 285): #for tilecount
    pset.addTerminal(i, float)
 
 pset.renameArguments(ARG0="TileCount")
-pset.renameArguments(ARG1="PosX")
-pset.renameArguments(ARG2="PosY")
-pset.renameArguments(ARG3="CarAngle")
-pset.renameArguments(ARG4="Speed")
-pset.renameArguments(ARG5="Wheels") #wheels on track
+#pset.renameArguments(ARG1="PosX")
+#pset.renameArguments(ARG2="PosY")
+pset.renameArguments(ARG1="CarAngle")
+pset.renameArguments(ARG2="Speed")
+pset.renameArguments(ARG3="Wheels") #wheels on track
 
 
 env_noviz = car_racing_edited.CarRacing()
@@ -138,10 +138,10 @@ def action_wrapper(action): #freeform action wrapper... allows for any combinati
 def discrete_wrapper(action): #defines a specific set of actions the car can take (basically discretizes them completely there is no continous spectrum)
     if action == 0: # if number is 0 do nothing
         return np.array([0, 0])
-    elif action > 0 and action <= 1: #action in range 0-1 turn left and gas
-        return np.array([-1, 1])
-    elif action > 1 and action <=2: #action in range 1-2 turn right and gas
-        return np.array([1, 1])
+    elif action > 0 and action <= 1: #action in range 0-1 turn left
+        return np.array([-1, 0])
+    elif action > 1 and action <=2: #action in range 1-2 turn right
+        return np.array([1, 0])
     elif action > 2 and action <=3: #action in range 2-3 brake
         return np.array([0, -0.8])
     else: #otherwise just gas
@@ -170,7 +170,7 @@ def evalRL(policy, vizualize=False):
             #action[1] = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), -1, 1)
             #action = action_wrapper(action)
             # use the expression tree to compute action from discrete_wrapper
-            action = numpy.clip(get_action(observation[0],observation[1],observation[2],observation[3],observation[4], observation[5]), 0, 4)
+            action = numpy.clip(get_action(observation[0],observation[3],observation[4], observation[5]), 0, 4)
             action = discrete_wrapper(action)
             try:
                 observation, reward, done, truncated, info = env.step(action)
@@ -202,7 +202,7 @@ random.seed(42)
 num_parallel_evals = 20 #change based on CPU host
 
 population_size = 30 #can be tweaked for better results
-num_generations = 500
+num_generations = 250
 prob_xover = 0.9
 prob_mutate = 0.4
 
