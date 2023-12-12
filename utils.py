@@ -1,37 +1,39 @@
 import math
 import cma
 import numpy as np
+from tqdm import tqdm
 
-def oneplus_lambda(x, fitness, gens=100, lam=20):
-    x_best = x
-    f_best = fitness(x)
+def oneplus_lambda(x0, fitness, gens=100, lam=20):
+    x_best = x0
+    f_best, x_best = fitness(x_best)
     x_history = {}
     fits = np.zeros(gens)
     for g in range(gens):
         N = np.random.normal(size=(lam, len(x)))
         for i in range(lam):
-            ind = np.clip(x + N[i, :], -1, 1)
-            f = fitness(ind)
+            x = np.clip(x + N[i, :], -1.49, 1.49)
+            f, x = fitness(x)
             if f < f_best:
                 f_best = f
-                x_best = ind
+                x_best = x
                 x_history[g] = {'fitness': f_best, 'actions': x_best.tolist()}
                 print(f"Generation: {g}, Best Fitness: {f_best}")
         x = x_best
         fits[g] = f_best
     return fits, x_best, x_history
 
-def cma_es(x, fitness, gens=100, popsize=10, processes=4):
-    es = cma.CMAEvolutionStrategy(x, 0.5, {'popsize': popsize, 'bounds': [-1.49, 1.49]})
-    x_best = x
-    f_best = fitness(x)
+def cma_es(x0, fitness, gens=100, popsize=10):
+    es = cma.CMAEvolutionStrategy(x0, 0.1, {'popsize': popsize, 'bounds': [-1.49, 1.49]})
+    x_best = x0
+    f_best, x_best = fitness(x_best)
+    print(f"Generation: 0, Best Fitness: {f_best}")
     x_history = {}
     fits = np.zeros(gens)
     for g in range(gens):
         solutions = es.ask()
         pop_fits = []
         for s in solutions:
-            f = fitness(s)
+            f, s = fitness(s)
             pop_fits.append(f)
             if f < f_best:
                 f_best = f
@@ -40,6 +42,30 @@ def cma_es(x, fitness, gens=100, popsize=10, processes=4):
                 print(f"Generation: {g}, Best Fitness: {f_best}")
         es.tell(solutions, pop_fits)
         es.disp()
+        fits[g] = f_best
+    return fits, x_best, x_history
+
+def mutation(x0, fitness, gens=100, lam=20, mut_rate=0.3, mut_scale=0.2):
+    x_best = x0
+    f_best, x_best = fitness(x_best)
+    print(f"Generation: 0, Best Fitness: {f_best}")
+    x_history = {}
+    fits = np.zeros(gens)
+    for g in range(gens):
+        population = [x_best, ]
+        for i in range(lam):
+            x = x_best.copy()
+            for j in range(len(x)):
+                if np.random.random() < mut_rate:
+                    x[j] += np.clip(np.random.normal(scale=mut_scale), -1.49, 1.49)
+            population.append(x)
+        for x in population:
+            f, x = fitness(x)
+            if f < f_best:
+                f_best = f
+                x_best = x
+                x_history[g] = {'fitness': f_best, 'actions': x_best.tolist()}
+                print(f"Generation: {g}, Best Fitness: {f_best}")
         fits[g] = f_best
     return fits, x_best, x_history
 
