@@ -168,9 +168,9 @@ def evalRL(policy, vizualize=False):
     return (fitness / num_episode,)
 
 #changeable strategy...
-strategy = gp.PrimitiveTree.from_string("", pset) #enter best strategy tree here
+strategy = gp.PrimitiveTree.from_string("sub(if_then_else(115, 254, 9), min(97, 275))", pset) #enter best strategy tree here
 print(strategy)
 evalRL(policy = strategy, vizualize=True)
 
-#best strategy from action_wrapper
-#write(sin(limit(sub(Speed, read(3)), sub(PosX, PosX), max(CarAngle, read(3)))), equal(max(sin(max(CarAngle, PosX)), write(if_then_else(CarAngle, write(if_then_else(PosX, add(PosX, Speed), PosX), equal(PosX, PosX)), sub(add(sub(PosX, PosX), limit(Speed, Speed, PosX)), add(PosX, Speed))), Wheels)), max(PosX, sub(read(equal(max(max(sub(max(CarAngle, Speed), add(PosX, Speed)), write(if_then_else(if_then_else(PosX, CarAngle, PosY), max(PosX, sub(Speed, PosX)), sin(sin(PosX))), Wheels)), read(equal(max(max(limit(sub(Speed, Speed), max(PosY, PosY), write(PosY, 5)), write(if_then_else(if_then_else(PosY, max(PosX, Speed), PosY), max(PosX, sub(Speed, PosX)), sin(PosX)), Wheels)), PosY), sin(PosX)))), PosX)), max(PosX, read(3))))))
+#best strategy from discrete_wrapper
+#sub(if_then_else(115, 254, 9), min(97, 275))
