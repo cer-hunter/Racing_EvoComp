@@ -1,6 +1,7 @@
 import numpy as np
 import json
 from operator import attrgetter
+import matplotlib.pyplot as plt
 
 import car_racing_edited
 import pygame
@@ -14,8 +15,8 @@ def get_tile_action(tile_actions, tile):
     return (np.array([steer, gas, brake]))
 
 def get_tile_action_int(tile_actions, tile):
-    steer = tile_actions[tile*2]
-    accel = tile_actions[tile*2+1]
+    steer = np.clip(tile_actions[tile*2], -1, 1)
+    accel = np.clip(tile_actions[tile*2+1], -1, 1)
     gas = 1 if accel > 0.4 else 0
     brake = 0.8 if accel < -0.4 else 0
     return (np.array([steer, gas, brake]))
@@ -51,16 +52,52 @@ def evaluate(tile_actions, visualize=False):
                 break
     return total_reward, tile_actions
 
-with open("data/tile_training_history.json", "r") as f:
+def get_history(history_file):
+    with open(f"{history_file}", "r") as f:
+        training_history = json.load(f)
+        prev_gens = max([int(x) for x in training_history.keys()]) + 1
+        print(f"Starting from generation {prev_gens}, last best fitness: {training_history[str(prev_gens - 1)]['fitness']}")
+
+    # f, _ = evaluate(tile_actions, visualize=True)
+#     print(f"Fitness: {f}")
+
+    gens = []
+    fits = []
+    for key, value in training_history.items():
+        if int(key) > 1:
+            gens.append(int(key)-1)
+            gens.append(int(key))
+            fits.append(-int(value['fitness']))
+            fits.append(-int(value['fitness']))
+    gens.pop(0)
+    fits.pop()
+    gens.append(gens[-1]+100)
+    fits.append(fits[-1])
+    return gens, fits
+
+with open("data/tile_training_history", "r") as f:
     training_history = json.load(f)
     prev_gens = max([int(x) for x in training_history.keys()]) + 1
     print(f"Starting from generation {prev_gens}, last best fitness: {training_history[str(prev_gens - 1)]['fitness']}")
 tile_actions = np.array(training_history[f"{prev_gens - 1}"]['actions'])
+tile_actions = np.array(training_history["751"]['actions'])
 
 env_viz = car_racing_edited.CarRacing(render_mode="human")
 env_noviz = car_racing_edited.CarRacing()
 env_noviz.reset()
 track_length = 140
 
-f, _ = evaluate(tile_actions, visualize=True)
-print(f"Fitness: {f}")
+gens, fits = get_history("data/tile_training_history-1.json")
+plt.plot(gens, fits)
+
+gens, fits = get_history("data/tile_training_history_best.json")
+plt.plot(gens, fits)
+
+gens, fits = get_history("data/tile_training_history_best_2.json")
+plt.plot(gens, fits)
+
+
+plt.xlabel('Generation')
+plt.ylabel('Fitness')
+plt.legend(['Random init, λ+1', 'Random init, CMA-ES', 'Straight init, CMA-ES'])
+plt.show()
